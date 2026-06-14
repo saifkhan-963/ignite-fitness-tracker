@@ -1,0 +1,15 @@
+# write node modules and build files to .gitignore
+# also write env folder to .gitignore
+
+node_modules/
+build/
+env/
+__pycache__/
+migrations/*
+!migrations/__init__.py
+.env
+.vscode/
+
+mobapp/
+dummy_data_postgres/
+
