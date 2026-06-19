@@ -1,0 +1,9 @@
+﻿node_modules/
+dist/
+build/
+.venv/
+__pycache__/
+*.lock
+db.sqlite3
+coverage/
+.git/

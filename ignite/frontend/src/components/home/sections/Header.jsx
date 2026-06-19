@@ -1,12 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '../../components/elements/Elements';
 import { Button } from '../../components/elements/Elements';
-import { LoginModal, SignupModal } from '../../auth/Auth';
+import { useAuth } from '../../contexts/AuthContext';
 
-export const Header = ({sections, activeSection, setActiveSection}) => {
+
+export const Header = ({sections, activeSection, setActiveSection, onOpenLogin, onOpenSignup}) => {
     const [isScrolled, setIsScrolled] = useState(false);
-    const [showLogin, setShowLogin] = useState(false);
-    const [showSignup, setShowSignup] = useState(false);
+    const navigate = useNavigate();
+    const { isLoggedIn, logout } = useAuth();
+
+    const handleLogout = () => {
+      logout();
+      navigate('/');
+    };
+
+    const handleDashboard = () => {
+      navigate('/dashboard');
+    };
   
     useEffect(() => {
       const handleScroll = () => {
@@ -22,34 +33,7 @@ export const Header = ({sections, activeSection, setActiveSection}) => {
       element?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    // Modal management functions
-    const handleOpenLogin = () => {
-      setShowSignup(false);
-      setShowLogin(true);
-    };
-
-    const handleOpenSignup = () => {
-      setShowLogin(false);
-      setShowSignup(true);
-    };
-
-    const handleCloseLogin = () => {
-      setShowLogin(false);
-    };
-
-    const handleCloseSignup = () => {
-      setShowSignup(false);
-    };
-
-    const handleSwitchToSignup = () => {
-      setShowLogin(false);
-      setTimeout(() => setShowSignup(true), 300); // Delay to allow animation to complete
-    };
-
-    const handleSwitchToLogin = () => {
-      setShowSignup(false);
-      setTimeout(() => setShowLogin(true), 300); // Delay to allow animation to complete
-    };
+    
   
     return (
       <>
@@ -81,33 +65,43 @@ export const Header = ({sections, activeSection, setActiveSection}) => {
   
               <div className="flex items-center space-x-4">
                 <ThemeToggle />
-                <Button 
-                  variant="secondary"
-                  onClick={handleOpenLogin}
-                >
-                  Login
-                </Button>
-                <Button 
-                  variant="primary"
-                  onClick={handleOpenSignup}
-                >
-                  Sign Up
-                </Button>
+                {isLoggedIn ? (
+                  <>
+                    <Button 
+                      variant="primary"
+                      onClick={handleDashboard}
+                    >
+                      Dashboard
+                    </Button>
+                    <Button 
+                      variant="secondary"
+                      onClick={handleLogout}
+                    >
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button 
+                      variant="secondary"
+                      onClick={onOpenLogin}
+                    >
+                      Login
+                    </Button>
+                    <Button 
+                      variant="primary"
+                      onClick={onOpenSignup}
+                    >
+                      Sign Up
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
         </header>
   
-        <LoginModal 
-          isOpen={showLogin} 
-          onClose={handleCloseLogin}
-          onSwitchToSignup={handleSwitchToSignup}
-        />
-        <SignupModal 
-          isOpen={showSignup} 
-          onClose={handleCloseSignup}
-          onSwitchToLogin={handleSwitchToLogin}
-        />
+        
       </>
     );
   };

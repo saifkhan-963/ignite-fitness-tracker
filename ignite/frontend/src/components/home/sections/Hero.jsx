@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import runman from "../images/runman.png"
 import { Button } from "../../components/elements/Elements"
 
-export const Hero = ({ isVisible }) => {
+export const Hero = ({ isVisible, onOpenSignup }) => {
     return (
         // <div className="absolute inset-0 bg-gradient-to-r from-[#FFF6DA]/90 to-transparent" />
         <div className="container mx-auto px-6 relative">
@@ -33,7 +33,7 @@ export const Hero = ({ isVisible }) => {
                              it's a lifestyle.
                         </p>
                         <div class="flex justify-start gap-4 mt-8">
-                            <button class="px-4 py-2 rounded-lg font-medium hover:scale-105 transform transition-all duration-300 flex items-center gap-2 bg-[#FF3B00] hover:bg-[#ff5a2b] text-white group bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
+                            <button onClick={onOpenSignup} class="px-4 py-2 rounded-lg font-medium hover:scale-105 transform transition-all duration-300 flex items-center gap-2 bg-[#FF3B00] hover:bg-[#ff5a2b] text-white group bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
                                 Start Your Journey
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wind w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform"><path d="M12.8 19.6A2 2 0 1 0 14 16H2"></path><path d="M17.5 8a2.5 2.5 0 1 1 2 4H2"></path><path d="M9.8 4.4A2 2 0 1 1 11 8H2"></path></svg>
                             </button>
