@@ -10,6 +10,8 @@ export const Dashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [profile, setProfile] = useState(null);
+  const [showJoinInput, setShowJoinInput] = useState(false);
+  const [joinCode, setJoinCode] = useState('');
 
   useEffect(() => {
     axios.get(`${API_URL}/me/`, { headers: authservice().getAuthHeader() })
@@ -20,6 +22,28 @@ export const Dashboard = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleCreateSession = async () => {
+    try {
+      const res = await axios.post(`${API_URL}/sessions/create/`, {}, {
+        headers: authservice().getAuthHeader(),
+      });
+      navigate(`/session/${res.data.id}`);
+    } catch (err) {
+      console.error('Failed to create session', err);
+    }
+  };
+
+  const handleJoinSession = async () => {
+    try {
+      const res = await axios.post(`${API_URL}/sessions/join/`, { invite_code: joinCode }, {
+        headers: authservice().getAuthHeader(),
+      });
+      navigate(`/session/${res.data.id}`);
+    } catch (err) {
+      console.error('Failed to join session', err);
+    }
   };
 
   return (
@@ -83,8 +107,43 @@ export const Dashboard = () => {
           </div>
         </div>
 
+        {/* Run Session Actions */}
+        <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <button
+            onClick={handleCreateSession}
+            className="flex-1 py-4 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold text-lg transition-colors shadow-lg"
+          >
+            Create Run
+          </button>
+          <button
+            onClick={() => setShowJoinInput(prev => !prev)}
+            className="flex-1 py-4 rounded-lg bg-white dark:bg-gray-800 border-2 border-orange-500 text-orange-500 font-bold text-lg hover:bg-orange-50 dark:hover:bg-gray-700 transition-colors shadow-lg"
+          >
+            Join Run
+          </button>
+        </div>
+
+        {showJoinInput && (
+          <div className="mt-4 flex gap-3">
+            <input
+              type="text"
+              value={joinCode}
+              onChange={e => setJoinCode(e.target.value.toUpperCase())}
+              placeholder="Enter invite code"
+              maxLength={8}
+              className="flex-1 px-4 py-3 rounded-lg border-2 border-orange-300 focus:border-orange-500 outline-none font-mono text-lg tracking-widest uppercase dark:bg-gray-800 dark:text-white"
+            />
+            <button
+              onClick={handleJoinSession}
+              className="px-6 py-3 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-bold transition-colors"
+            >
+              Join
+            </button>
+          </div>
+        )}
+
         {/* Placeholder Message */}
-        <div className="mt-12 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+        <div className="mt-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
           <p className="text-center text-gray-600 dark:text-gray-300">
             More features coming soon! Track workouts, set goals, and compete with friends.
           </p>

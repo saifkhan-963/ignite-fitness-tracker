@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import ValidationError
-from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge
+from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge, RunSession
 
 
 
@@ -73,3 +73,8 @@ class ChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Challenge
         fields = "__all__"
+
+class RunSessionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = RunSession
+        fields = ('id', 'host', 'participants', 'invite_code', 'status', 'created_at', 'started_at', 'ended_at')

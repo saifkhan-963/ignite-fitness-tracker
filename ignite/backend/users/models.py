@@ -115,6 +115,25 @@ class Leaderboard(models.Model):
         return f"{self.user.username} - {self.time_period}"
 
 
+class RunSession(models.Model):
+    STATUS_CHOICES = [
+        ('waiting', 'Waiting'),
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+    ]
+
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hosted_sessions')
+    participants = models.ManyToManyField(User, related_name='joined_sessions', blank=True)
+    invite_code = models.CharField(max_length=8, unique=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
+    created_at = models.DateTimeField(auto_now_add=True)
+    started_at = models.DateTimeField(null=True, blank=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.host.username} - {self.invite_code}"
+
+
 # Challenges (optional community feature)
 class Challenge(models.Model):
     name = models.CharField(max_length=100)

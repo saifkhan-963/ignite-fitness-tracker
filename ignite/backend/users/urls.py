@@ -10,7 +10,10 @@ from .views import (
     AchievementViewSet,
     UserAchievementViewSet,
     LeaderboardViewSet,
-    ChallengeViewSet
+    ChallengeViewSet,
+    CreateSessionView,
+    JoinSessionView,
+    SessionDetailView
 )
 
 router = DefaultRouter()
@@ -27,5 +30,8 @@ urlpatterns = [
     path('me/', MeView.as_view(), name='me'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('sessions/create/', CreateSessionView.as_view(), name='create-session'),
+    path('sessions/join/', JoinSessionView.as_view(), name='join-session'),
+    path('sessions/<int:pk>/', SessionDetailView.as_view(), name='session-detail'),
     path('', include(router.urls)),
 ]

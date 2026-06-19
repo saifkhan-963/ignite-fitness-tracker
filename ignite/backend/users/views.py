@@ -1,11 +1,13 @@
+import random
+import string
 from django.utils import timezone
-from rest_framework import generics
+from rest_framework import generics, viewsets, permissions
+from rest_framework import status as http_status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework import generics, viewsets, permissions
-from rest_framework.response import Response
-from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge
+from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge, RunSession
 from .serializers import (
     RegisterSerializer,
     LoginSerializer,
@@ -14,7 +16,8 @@ from .serializers import (
     AchievementSerializer,
     UserAchievementSerializer,
     LeaderboardSerializer,
-    ChallengeSerializer
+    ChallengeSerializer,
+    RunSessionSerializer
 )
 
 # Create your views here.
@@ -112,3 +115,48 @@ class ChallengeViewSet(viewsets.ModelViewSet):
         challenge = serializer.save()
         # challenge.participants.add(self.request.user)  # Add the creator as a participant by default
         challenge.save()
+
+
+class CreateSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        invite_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        session = RunSession.objects.create(host=request.user, invite_code=invite_code)
+        session.participants.add(request.user)
+        serializer = RunSessionSerializer(session)
+        return Response(serializer.data, status=http_status.HTTP_201_CREATED)
+
+
+class JoinSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        invite_code = request.data.get('invite_code')
+        try:
+            session = RunSession.objects.get(invite_code=invite_code)
+        except RunSession.DoesNotExist:
+            return Response({'detail': 'Session not found.'}, status=http_status.HTTP_404_NOT_FOUND)
+
+        if session.status != 'waiting':
+            return Response({'detail': 'Session is not accepting participants'}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        session.participants.add(request.user)
+        serializer = RunSessionSerializer(session)
+        return Response(serializer.data)
+
+
+class SessionDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            session = RunSession.objects.get(pk=pk)
+        except RunSession.DoesNotExist:
+            return Response({'detail': 'Session not found.'}, status=http_status.HTTP_404_NOT_FOUND)
+
+        if request.user not in session.participants.all():
+            return Response({'detail': 'Forbidden.'}, status=http_status.HTTP_403_FORBIDDEN)
+
+        serializer = RunSessionSerializer(session)
+        return Response(serializer.data)

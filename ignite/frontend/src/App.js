@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
 import { LandingPage } from "./components/home/LandingPage";
 import { Dashboard } from "./components/dashboard/Dashboard";
+import { SessionLobby } from "./components/session/SessionLobby";
 import { useAuth } from "./components/contexts/AuthContext";
 
 const ProtectedRoute = ({ element }) => {
@@ -22,6 +23,7 @@ function App() {
 
   const protectedRoutes = [
     {path: '/dashboard', element: <ProtectedRoute element={<Dashboard />} />},
+    {path: '/session/:id', element: <ProtectedRoute element={<SessionLobby />} />},
   ];
 
   const routes = [
