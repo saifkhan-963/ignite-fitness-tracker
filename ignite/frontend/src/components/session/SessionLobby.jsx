@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { API_URL } from '../../data/variables';
-import { authservice } from '../services/AuthService';
+import axiosInstance from '../../../utils/axiosInstance';
 
 export const SessionLobby = () => {
   const { id } = useParams();
@@ -13,9 +11,7 @@ export const SessionLobby = () => {
 
   const fetchSession = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/sessions/${id}/`, {
-        headers: authservice().getAuthHeader(),
-      });
+      const res = await axiosInstance.get(`/sessions/${id}/`);
       setSession(res.data);
     } catch (err) {
       setError('Failed to load session.');
@@ -23,7 +19,7 @@ export const SessionLobby = () => {
   }, [id]);
 
   useEffect(() => {
-    axios.get(`${API_URL}/me/`, { headers: authservice().getAuthHeader() })
+    axiosInstance.get('/me/')
       .then(res => setCurrentUser(res.data))
       .catch(() => setError('Failed to load user.'));
   }, []);

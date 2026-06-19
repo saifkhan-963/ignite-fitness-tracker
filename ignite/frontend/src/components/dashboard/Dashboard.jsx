@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../../utils/axiosInstance';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/elements/Elements';
-import { authservice } from '../services/AuthService';
-import { API_URL } from '../../data/variables';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
@@ -14,7 +12,7 @@ export const Dashboard = () => {
   const [joinCode, setJoinCode] = useState('');
 
   useEffect(() => {
-    axios.get(`${API_URL}/me/`, { headers: authservice().getAuthHeader() })
+    axiosInstance.get('/me/')
       .then(res => setProfile(res.data))
       .catch(err => console.error('Failed to fetch profile', err));
   }, []);
@@ -26,9 +24,7 @@ export const Dashboard = () => {
 
   const handleCreateSession = async () => {
     try {
-      const res = await axios.post(`${API_URL}/sessions/create/`, {}, {
-        headers: authservice().getAuthHeader(),
-      });
+      const res = await axiosInstance.post('/sessions/create/', {});
       navigate(`/session/${res.data.id}`);
     } catch (err) {
       console.error('Failed to create session', err);
@@ -37,9 +33,7 @@ export const Dashboard = () => {
 
   const handleJoinSession = async () => {
     try {
-      const res = await axios.post(`${API_URL}/sessions/join/`, { invite_code: joinCode }, {
-        headers: authservice().getAuthHeader(),
-      });
+      const res = await axiosInstance.post('/sessions/join/', { invite_code: joinCode });
       navigate(`/session/${res.data.id}`);
     } catch (err) {
       console.error('Failed to join session', err);
