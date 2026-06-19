@@ -47,7 +47,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = "__all__"
+        fields = ('id', 'username', 'email', 'bio', 'avatar', 'gender', 'birth_date', 'country', 'total_steps', 'total_distance', 'total_time', 'total_runs', 'weight', 'height')
 
 class RunSerializer(serializers.ModelSerializer):
     class Meta:
