@@ -159,7 +159,12 @@ class SessionDetailView(APIView):
             return Response({'detail': 'Forbidden.'}, status=http_status.HTTP_403_FORBIDDEN)
 
         serializer = RunSessionSerializer(session)
-        return Response(serializer.data)
+        data = serializer.data
+        data['participants_data'] = [
+            {'id': u.id, 'username': u.username}
+            for u in session.participants.all()
+        ]
+        return Response(data)
 
 
 class StartSessionView(APIView):

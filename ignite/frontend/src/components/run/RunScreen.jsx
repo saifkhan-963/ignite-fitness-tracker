@@ -65,9 +65,9 @@ export const RunScreen = () => {
     );
   }
 
-  const participantStats = session.participants.map(pid => ({
-    id: pid,
-    ...getSimulatedStats(pid),
+  const participantStats = (session.participants_data || []).map(p => ({
+    ...p,
+    ...getSimulatedStats(p.id),
   }));
 
   const leader = participantStats.reduce((a, b) => (a.distanceKm >= b.distanceKm ? a : b), participantStats[0]);
@@ -98,9 +98,7 @@ export const RunScreen = () => {
           {participantStats.map(p => {
             const isYou = p.id === currentUser.id;
             const isLeading = p.id === leader.id && participantStats.length > 1;
-            const label = p.id === session.host
-              ? `Host${isYou ? ' (You)' : ''}`
-              : `Runner ${p.id}${isYou ? ' (You)' : ''}`;
+            const label = `${p.username}${isYou ? ' (You)' : ''}`;
 
             return (
               <div

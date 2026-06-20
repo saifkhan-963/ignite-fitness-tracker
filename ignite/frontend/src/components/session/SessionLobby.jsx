@@ -92,23 +92,23 @@ export const SessionLobby = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-gray-700 dark:text-gray-200 font-semibold text-lg">Participants</h2>
-            <span className="text-sm text-orange-500 font-medium">{session.participants.length} joined</span>
+            <span className="text-sm text-orange-500 font-medium">{(session.participants_data || []).length} joined</span>
           </div>
-          {session.participants.length === 0 ? (
+          {(session.participants_data || []).length === 0 ? (
             <p className="text-gray-400 text-sm">No participants yet.</p>
           ) : (
             <ul className="space-y-2">
-              {session.participants.map((participantId) => (
+              {(session.participants_data || []).map((p) => (
                 <li
-                  key={participantId}
+                  key={p.id}
                   className="flex items-center gap-3 px-4 py-3 bg-orange-50 dark:bg-gray-700 rounded-lg"
                 >
                   <div className="w-8 h-8 rounded-full bg-orange-400 flex items-center justify-center text-white font-bold text-sm">
-                    {participantId === session.host ? 'H' : 'P'}
+                    {p.id === session.host ? 'H' : 'P'}
                   </div>
                   <span className="text-gray-700 dark:text-gray-200 text-sm">
-                    {participantId === session.host ? 'Host' : `Runner ${participantId}`}
-                    {participantId === currentUser.id && ' (You)'}
+                    {p.username}
+                    {p.id === currentUser.id && ' (You)'}
                   </span>
                 </li>
               ))}
