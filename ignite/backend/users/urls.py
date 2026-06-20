@@ -13,7 +13,8 @@ from .views import (
     ChallengeViewSet,
     CreateSessionView,
     JoinSessionView,
-    SessionDetailView
+    SessionDetailView,
+    StartSessionView
 )
 
 router = DefaultRouter()
@@ -33,5 +34,6 @@ urlpatterns = [
     path('sessions/create/', CreateSessionView.as_view(), name='create-session'),
     path('sessions/join/', JoinSessionView.as_view(), name='join-session'),
     path('sessions/<int:pk>/', SessionDetailView.as_view(), name='session-detail'),
+    path('sessions/<int:pk>/start/', StartSessionView.as_view(), name='start-session'),
     path('', include(router.urls)),
 ]

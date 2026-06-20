@@ -160,3 +160,26 @@ class SessionDetailView(APIView):
 
         serializer = RunSessionSerializer(session)
         return Response(serializer.data)
+
+
+class StartSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            session = RunSession.objects.get(pk=pk)
+        except RunSession.DoesNotExist:
+            return Response({'detail': 'Session not found.'}, status=http_status.HTTP_404_NOT_FOUND)
+
+        if request.user != session.host:
+            return Response({'detail': 'Only the host can start the run.'}, status=http_status.HTTP_403_FORBIDDEN)
+
+        if session.status != 'waiting':
+            return Response({'detail': 'Session already started.'}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        session.status = 'active'
+        session.started_at = timezone.now()
+        session.save()
+
+        serializer = RunSessionSerializer(session)
+        return Response(serializer.data)

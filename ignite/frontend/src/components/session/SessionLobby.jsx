@@ -30,9 +30,19 @@ export const SessionLobby = () => {
     return () => clearInterval(interval);
   }, [fetchSession]);
 
-  const handleStartRun = () => {
-    console.log('Start run clicked for session', id);
+  const handleStartRun = async () => {
+    try {
+      await axiosInstance.post(`/sessions/${id}/start/`);
+    } catch {
+      setError('Failed to start run.');
+    }
   };
+
+  useEffect(() => {
+    if (session && session.status === 'active') {
+      navigate(`/run/${id}`);
+    }
+  }, [session, id, navigate]);
 
   const handleLeave = async () => {
     navigate('/dashboard');
