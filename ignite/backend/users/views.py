@@ -5,6 +5,7 @@ from rest_framework import generics, viewsets, permissions
 from rest_framework import status as http_status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge, RunSession
@@ -33,10 +34,14 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = RegisterSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'register'
 
 class LoginView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
