@@ -188,3 +188,26 @@ class StartSessionView(APIView):
 
         serializer = RunSessionSerializer(session)
         return Response(serializer.data)
+
+
+class EndSessionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            session = RunSession.objects.get(pk=pk)
+        except RunSession.DoesNotExist:
+            return Response({'detail': 'Session not found.'}, status=http_status.HTTP_404_NOT_FOUND)
+
+        if request.user not in session.participants.all():
+            return Response({'detail': 'Forbidden.'}, status=http_status.HTTP_403_FORBIDDEN)
+
+        if session.status != 'active':
+            return Response({'detail': 'Session is not active.'}, status=http_status.HTTP_400_BAD_REQUEST)
+
+        session.status = 'completed'
+        session.ended_at = timezone.now()
+        session.save()
+
+        serializer = RunSessionSerializer(session)
+        return Response(serializer.data)

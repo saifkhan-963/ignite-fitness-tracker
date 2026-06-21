@@ -3,6 +3,7 @@ import { LandingPage } from "./components/home/LandingPage";
 import { Dashboard } from "./components/dashboard/Dashboard";
 import { SessionLobby } from "./components/session/SessionLobby";
 import { RunScreen } from "./components/run/RunScreen";
+import { RunSummary } from "./components/run/RunSummary";
 import { useAuth } from "./components/contexts/AuthContext";
 
 const ProtectedRoute = ({ element }) => {
@@ -26,6 +27,7 @@ function App() {
     {path: '/dashboard', element: <ProtectedRoute element={<Dashboard />} />},
     {path: '/session/:id', element: <ProtectedRoute element={<SessionLobby />} />},
     {path: '/run/:id', element: <ProtectedRoute element={<RunScreen />} />},
+    {path: '/summary/:id', element: <ProtectedRoute element={<RunSummary />} />},
   ];
 
   const routes = [

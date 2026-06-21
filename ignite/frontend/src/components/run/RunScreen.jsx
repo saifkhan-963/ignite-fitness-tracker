@@ -8,7 +8,10 @@ export const RunScreen = () => {
   const [session, setSession] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [elapsed, setElapsed] = useState(0);
+  const [error, setError] = useState(null);
   const startedAtRef = useRef(null);
+  const endRunInitiatedRef = useRef(false);
+  const elapsedRef = useRef(0);
 
   const fetchSession = useCallback(async () => {
     try {
@@ -35,7 +38,9 @@ export const RunScreen = () => {
   useEffect(() => {
     const tick = setInterval(() => {
       if (startedAtRef.current) {
-        setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000));
+        const seconds = Math.floor((Date.now() - startedAtRef.current) / 1000);
+        elapsedRef.current = seconds;
+        setElapsed(seconds);
       }
     }, 1000);
     return () => clearInterval(tick);
@@ -48,14 +53,28 @@ export const RunScreen = () => {
   };
 
   // PLACEHOLDER: simulated GPS stats until real GPS is wired up
-  const getSimulatedStats = (participantId) => {
+  const getSimulatedStats = (participantId, elapsedSecs) => {
     const seed = (participantId % 5) + 1;
     const pace = 3 + seed * 0.1; // m/s, slightly different per participant
-    const distanceKm = (elapsed * pace) / 1000;
+    const distanceKm = (elapsedSecs * pace) / 1000;
     const paceMinPerKm = pace > 0 ? (1000 / pace / 60) : 0;
     const paceStr = `${Math.floor(paceMinPerKm)}:${String(Math.round((paceMinPerKm % 1) * 60)).padStart(2, '0')} /km`;
     return { distanceKm, paceStr };
   };
+
+  useEffect(() => {
+    if (session?.status === 'completed' && !endRunInitiatedRef.current) {
+      const currentElapsed = elapsedRef.current;
+      const stats = (session.participants_data || []).map(p => {
+        const { distanceKm, paceStr } = getSimulatedStats(p.id, currentElapsed);
+        return { id: p.id, username: p.username, distance: distanceKm, pace: paceStr };
+      });
+      const duration = formatTime(currentElapsed);
+      const winner = stats.reduce((a, b) => (a.distance >= b.distance ? a : b), stats[0]);
+      const winner_username = winner ? winner.username : '';
+      navigate(`/summary/${id}`, { state: { duration, results: stats, winner_username } });
+    }
+  }, [session, id, navigate]);
 
   if (!session || !currentUser) {
     return (
@@ -67,10 +86,29 @@ export const RunScreen = () => {
 
   const participantStats = (session.participants_data || []).map(p => ({
     ...p,
-    ...getSimulatedStats(p.id),
+    ...getSimulatedStats(p.id, elapsed),
   }));
 
   const leader = participantStats.reduce((a, b) => (a.distanceKm >= b.distanceKm ? a : b), participantStats[0]);
+
+  const handleEndRun = async () => {
+    endRunInitiatedRef.current = true;
+    try {
+      await axiosInstance.post(`/sessions/${id}/end/`);
+    } catch (err) {
+      setError(err?.response?.data?.detail || 'Failed to end session.');
+    }
+    const results = participantStats.map(p => ({
+      id: p.id,
+      username: p.username,
+      distance: p.distanceKm,
+      pace: p.paceStr,
+    }));
+    const duration = formatTime(elapsed);
+    const winner = results.reduce((a, b) => (a.distance >= b.distance ? a : b), results[0]);
+    const winner_username = winner ? winner.username : '';
+    navigate(`/summary/${id}`, { state: { duration, results, winner_username } });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFF6DA] to-[#FFE4CC] dark:from-[#2A2D3E] dark:to-[#16182A]">
@@ -78,7 +116,7 @@ export const RunScreen = () => {
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-orange-500">IGNITE Live Run</h1>
           <button
-            onClick={() => navigate('/dashboard')}
+            onClick={handleEndRun}
             className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
           >
             End Run
