@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from './sections/Header';
 import { Hero } from './sections/Hero';
 import { Features } from './sections/Features';
-import { Pricing } from './sections/Pricing';
+import { Waitlist } from './sections/Waitlist';
 import { Reviews } from './sections/Reviews';
 import { Footer } from './sections/Footer';
 import { LoginModal, SignupModal } from '../auth/Auth';
@@ -23,7 +23,7 @@ export const LandingPage = () => {
   const [isVisible, setIsVisible] = useState({
     hero: false,
     features: false,
-    pricing: false,
+    waitlist: false,
     reviews: false
   });
 
@@ -31,7 +31,7 @@ export const LandingPage = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
 
-  const sections = ['home', 'features', 'pricing', 'reviews'];
+  const sections = ['home', 'features', 'waitlist', 'reviews'];
 
   const handleOpenLogin = () => {
     setShowSignup(false);
@@ -101,10 +101,10 @@ export const LandingPage = () => {
       </section>
 
       <section
-        id="pricing"
+        id="waitlist"
         className="py-20 bg-gradient-to-br from-[#FFF6DA] to-[#FFE4CC] dark:from-gray-900 dark:to-gray-900"
       >
-        <Pricing isVisible={isVisible.pricing} />
+        <Waitlist isVisible={isVisible.waitlist} />
       </section>
 
       <section
