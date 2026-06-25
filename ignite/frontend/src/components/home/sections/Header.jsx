@@ -43,8 +43,8 @@ export const Header = ({sections, activeSection, setActiveSection, onOpenLogin, 
         `}>
           <div className="container mx-auto px-6 py-4">
             <div className="flex items-center justify-between">
-            <button class="text-2xl font-bold text-orange-500 hover:scale-110 hover:shadow-lg transition-all duration-300 group relative" onClick={() => scrollToSection('home')}>
-            <div class="absolute bottom-0 left-0 w-full h-1 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>IGNITE</button>
+            <button className="text-2xl font-bold text-orange-500 hover:scale-110 hover:shadow-lg transition-all duration-300 group relative" onClick={() => scrollToSection('home')}>
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-orange-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>IGNITE</button>
               <nav className="hidden md:flex items-center space-x-8">
                 {sections.map((section) => (
                   <button
