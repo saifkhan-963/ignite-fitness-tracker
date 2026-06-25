@@ -1,37 +1,37 @@
 import React from "react";
-import { Map, BarChart2, Trophy, Users, Smartphone, User } from "lucide-react";
+import { Zap, MapPin, Flag, Mic, Scale, Shield } from "lucide-react";
 
 export const Features = ({isVisible}) => {
     const features = [
       {
-        icon: Map,
-        title: "Real-Time Tracking",
-        description: "Track your runs with precision GPS mapping and get detailed insights about your performance."
+        icon: Zap,
+        title: "Truly Synchronous",
+        description: "Both of you run at the exact same moment. Not share-after, not leaderboards — live, right now, together. No other app does this."
       },
       {
-        icon: BarChart2,
-        title: "Advanced Analytics",
-        description: "Deep dive into your running metrics with AI-powered insights and personalized recommendations."
+        icon: MapPin,
+        title: "Route Moments",
+        description: "Drop a photo or short video pinned to your GPS location mid-run. Your route becomes a living map of real moments, not just a stat line."
       },
       {
-        icon: Trophy,
-        title: "Achievement System",
-        description: "Earn badges, unlock achievements, and celebrate your milestones as you progress."
+        icon: Flag,
+        title: "Pursuit Mode",
+        description: "Start behind your friend and close the gap live. Every meter matters. The most competitive running experience ever built. Coming soon."
       },
       {
-        icon: Users,
-        title: "Global Community",
-        description: "Connect with runners worldwide, share experiences, and participate in virtual races."
+        icon: Mic,
+        title: "Voice During Runs",
+        description: "Talk while you run. No phone calls, no switching apps — just your running partner in your ear, live, the whole session."
       },
       {
-        icon: Smartphone,
-        title: "Cross-Platform",
-        description: "Seamlessly sync your data across all devices with our cloud-based platform."
+        icon: Scale,
+        title: "Live Handicapping",
+        description: "A beginner vs a veteran is still a fair race. IGNITE auto-balances the gap so every run is competitive regardless of fitness level."
       },
       {
-        icon: User,
-        title: "Personal Coach",
-        description: "Get AI-powered training plans tailored to your goals and fitness level."
+        icon: Shield,
+        title: "Never Lose a Run",
+        description: "Every session is saved, always. No GPS glitch, no app crash, no lost data. Your run is yours permanently — unlike other apps."
       }
     ];
   
@@ -43,7 +43,7 @@ export const Features = ({isVisible}) => {
     ${isVisible.features ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0'}
   `}>
         
-          Why Choose <span className="text-orange-500">IGNITE</span>?
+          Built for the run. <span className="text-orange-500">Not the post.</span>
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
