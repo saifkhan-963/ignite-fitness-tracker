@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge, RunSession
+from .models import User, Run, Achievement, UserAchievement, Leaderboard, Challenge, RunSession, WaitlistEntry
 from .serializers import (
     RegisterSerializer,
     LoginSerializer,
@@ -21,7 +21,7 @@ from .serializers import (
     RunSessionSerializer
 )
 
-# Create your views here.
+
 class MeView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
@@ -37,6 +37,7 @@ class RegisterView(generics.CreateAPIView):
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'register'
 
+
 class LoginView(generics.GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
@@ -47,70 +48,57 @@ class LoginView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
-        
-        # Update last login
         user.last_login = timezone.now()
         user.save()
-
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
-        
         return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
         })
-        
 
-# User ViewSet
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
         return self.queryset.filter(id=self.request.user.id)
 
 
-# Run ViewSet
 class RunViewSet(viewsets.ModelViewSet):
     queryset = Run.objects.all()
     serializer_class = RunSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Users can only see their own runs
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
 
-# Achievement ViewSet
 class AchievementViewSet(viewsets.ModelViewSet):
     queryset = Achievement.objects.all()
     serializer_class = AchievementSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
-# UserAchievement ViewSet
 class UserAchievementViewSet(viewsets.ModelViewSet):
     queryset = UserAchievement.objects.all()
     serializer_class = UserAchievementSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Users can only see their own achievements
         return UserAchievement.objects.filter(user=self.request.user)
 
 
-# Leaderboard ViewSet
 class LeaderboardViewSet(viewsets.ModelViewSet):
     queryset = Leaderboard.objects.all()
     serializer_class = LeaderboardSerializer
     permission_classes = [permissions.IsAuthenticated]
 
 
-# Challenge ViewSet
 class ChallengeViewSet(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
@@ -118,7 +106,6 @@ class ChallengeViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         challenge = serializer.save()
-        # challenge.participants.add(self.request.user)  # Add the creator as a participant by default
         challenge.save()
 
 
@@ -216,3 +203,16 @@ class EndSessionView(APIView):
 
         serializer = RunSessionSerializer(session)
         return Response(serializer.data)
+
+
+class WaitlistView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip().lower()
+        if not email:
+            return Response({'error': 'Email is required.'}, status=http_status.HTTP_400_BAD_REQUEST)
+        if WaitlistEntry.objects.filter(email=email).exists():
+            return Response({'message': 'Already on the waitlist.'}, status=http_status.HTTP_200_OK)
+        WaitlistEntry.objects.create(email=email)
+        return Response({'message': 'Successfully joined the waitlist.'}, status=http_status.HTTP_201_CREATED)

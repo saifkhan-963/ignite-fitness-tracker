@@ -15,7 +15,8 @@ from .views import (
     JoinSessionView,
     SessionDetailView,
     StartSessionView,
-    EndSessionView
+    EndSessionView,
+    WaitlistView
 )
 
 router = DefaultRouter()
@@ -37,5 +38,6 @@ urlpatterns = [
     path('sessions/<int:pk>/', SessionDetailView.as_view(), name='session-detail'),
     path('sessions/<int:pk>/start/', StartSessionView.as_view(), name='start-session'),
     path('sessions/<int:pk>/end/', EndSessionView.as_view(), name='end-session'),
+    path('waitlist/', WaitlistView.as_view(), name='waitlist'),
     path('', include(router.urls)),
 ]

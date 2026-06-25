@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 
 export const Waitlist = ({ isVisible }) => {
   const [email, setEmail] = useState('');
@@ -9,10 +10,18 @@ export const Waitlist = ({ isVisible }) => {
     e.preventDefault();
     if (!email) return;
     setLoading(true);
-    // TODO: wire to POST /api/waitlist/ next session
-    await new Promise(r => setTimeout(r, 600));
-    setSubmitted(true);
-    setLoading(false);
+    try {
+      await axios.post('http://127.0.0.1:8000/api/waitlist/', { email });
+      setSubmitted(true);
+    } catch (err) {
+      if (err.response?.status === 200) {
+        setSubmitted(true);
+      } else {
+        alert('Something went wrong. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
