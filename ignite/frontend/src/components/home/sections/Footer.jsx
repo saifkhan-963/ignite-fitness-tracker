@@ -19,7 +19,7 @@ export const Footer = ({activeSection, setActiveSection}) => {
             </span>
           </h3>
           <p className="text-gray-600 dark:text-gray-400 transition-colors duration-300">
-            Join thousands of runners who are transforming their fitness journey with IGNITE
+            The only app where two people run live together, from anywhere in the world. Currently in early access.
           </p>
         </div>
         <div>
@@ -35,10 +35,10 @@ export const Footer = ({activeSection, setActiveSection}) => {
             </li>
             <li>
               <button 
-                onClick={() => handleScroll('pricing')} 
+                onClick={() => handleScroll('waitlist')} 
                 className="text-gray-600 dark:text-gray-400 hover:text-orange-500 dark:hover:text-orange-400 transition-colors duration-300"
               >
-                Pricing
+                Waitlist
               </button>
             </li>
             <li>
@@ -78,7 +78,7 @@ export const Footer = ({activeSection, setActiveSection}) => {
         </div>
       </div>
       <div className="border-t border-gray-800 dark:border-gray-200 mt-8 py-4 text-center transition-colors duration-300">
-        <p className="text-gray-600 dark:text-gray-400">© 2024 IGNITE. All rights reserved.</p>
+        <p className="text-gray-600 dark:text-gray-400">© 2026 IGNITE. All rights reserved.</p>
       </div>
     </div>
   )
