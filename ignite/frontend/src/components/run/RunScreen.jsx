@@ -12,6 +12,10 @@ export const RunScreen = () => {
   const startedAtRef = useRef(null);
   const endRunInitiatedRef = useRef(false);
   const elapsedRef = useRef(0);
+  const [myDistance, setMyDistance] = useState(0);
+  const [myPace, setMyPace] = useState('--:-- /km');
+  const lastPositionRef = useRef(null);
+  const watchIdRef = useRef(null);
 
   const fetchSession = useCallback(async () => {
     try {
@@ -52,10 +56,67 @@ export const RunScreen = () => {
     return `${m}:${s}`;
   };
 
-  // PLACEHOLDER: simulated GPS stats until real GPS is wired up
+  // Haversine formula — calculates distance between two GPS coordinates in km
+  const haversine = (lat1, lon1, lat2, lon2) => {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  // Real GPS tracking — starts when session is active
+  useEffect(() => {
+    if (!session || session.status !== 'active') return;
+    if (!navigator.geolocation) return;
+
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        if (lastPositionRef.current) {
+          const { lat, lon } = lastPositionRef.current;
+          const delta = haversine(lat, lon, latitude, longitude);
+          // Filter out GPS noise — ignore movements under 2 meters
+          if (delta > 0.002) {
+            setMyDistance(prev => {
+              const newDist = prev + delta;
+              // Calculate pace from elapsed time and distance
+              const elapsedMins = elapsedRef.current / 60;
+              if (newDist > 0 && elapsedMins > 0) {
+                const paceMinPerKm = elapsedMins / newDist;
+                const paceMin = Math.floor(paceMinPerKm);
+                const paceSec = String(Math.round((paceMinPerKm % 1) * 60)).padStart(2, '0');
+                setMyPace(`${paceMin}:${paceSec} /km`);
+              }
+              return newDist;
+            });
+          }
+        }
+        lastPositionRef.current = { lat: latitude, lon: longitude };
+      },
+      (err) => console.warn('GPS error:', err.message),
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+
+    return () => {
+      if (watchIdRef.current) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, [session]);
+
+  // Simulated stats for partner (until Phase 2 sends real GPS to backend)
   const getSimulatedStats = (participantId, elapsedSecs) => {
     const seed = (participantId % 5) + 1;
-    const pace = 3 + seed * 0.1; // m/s, slightly different per participant
+    const pace = 3 + seed * 0.1;
     const distanceKm = (elapsedSecs * pace) / 1000;
     const paceMinPerKm = pace > 0 ? (1000 / pace / 60) : 0;
     const paceStr = `${Math.floor(paceMinPerKm)}:${String(Math.round((paceMinPerKm % 1) * 60)).padStart(2, '0')} /km`;
@@ -84,10 +145,19 @@ export const RunScreen = () => {
     );
   }
 
-  const participantStats = (session.participants_data || []).map(p => ({
-    ...p,
-    ...getSimulatedStats(p.id, elapsed),
-  }));
+  const participantStats = (session.participants_data || []).map(p => {
+    if (currentUser && p.id === currentUser.id) {
+      return {
+        ...p,
+        distanceKm: myDistance,
+        paceStr: myPace,
+      };
+    }
+    return {
+      ...p,
+      ...getSimulatedStats(p.id, elapsed),
+    };
+  });
 
   const leader = participantStats.reduce((a, b) => (a.distanceKm >= b.distanceKm ? a : b), participantStats[0]);
 
@@ -101,8 +171,8 @@ export const RunScreen = () => {
     const results = participantStats.map(p => ({
       id: p.id,
       username: p.username,
-      distance: p.distanceKm,
-      pace: p.paceStr,
+      distance: currentUser && p.id === currentUser.id ? myDistance : p.distanceKm,
+      pace: currentUser && p.id === currentUser.id ? myPace : p.paceStr,
     }));
     const duration = formatTime(elapsed);
     const winner = results.reduce((a, b) => (a.distance >= b.distance ? a : b), results[0]);
