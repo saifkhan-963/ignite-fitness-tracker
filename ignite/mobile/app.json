@@ -1,0 +1,34 @@
+{
+  "expo": {
+    "name": "IGNITE",
+    "slug": "ignite",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#121212"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ignite.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#121212"
+      },
+      "package": "com.ignite.app"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "IGNITE needs your location to track your run distance and pace in real time."
+        }
+      ]
+    ]
+  }
+}
