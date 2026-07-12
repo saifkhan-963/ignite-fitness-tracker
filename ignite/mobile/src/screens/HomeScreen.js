@@ -37,7 +37,7 @@ function SkeletonBlock({ style }) {
   );
 }
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
   const { user, isLoading, logout } = useAuth();
   const [inviteCode, setInviteCode] = useState('');
   const activeTab = 'home';
@@ -73,7 +73,10 @@ export default function HomeScreen() {
         )}
 
         {/* Primary CTA */}
-        <Pressable className="mt-6 h-14 w-full items-center justify-center rounded-xl bg-competition active:bg-competition-dim">
+        <Pressable
+          className="mt-6 h-14 w-full items-center justify-center rounded-xl bg-competition active:bg-competition-dim"
+          onPress={() => navigation.navigate('Session', { mode: 'create' })}
+        >
           <Text className="text-lg font-semibold text-content">Create Session</Text>
         </Pressable>
 
@@ -88,7 +91,10 @@ export default function HomeScreen() {
             autoCapitalize="characters"
             autoCorrect={false}
           />
-          <Pressable className="h-14 items-center justify-center px-4 active:bg-elevated">
+          <Pressable
+            className="h-14 items-center justify-center px-4 active:bg-elevated"
+            onPress={() => inviteCode.trim() && navigation.navigate('Session', { mode: 'join', inviteCode: inviteCode.trim() })}
+          >
             <Text className="text-lg font-semibold text-content-secondary">Join Session</Text>
           </Pressable>
         </View>

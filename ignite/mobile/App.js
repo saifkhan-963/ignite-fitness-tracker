@@ -6,6 +6,9 @@ import { ActivityIndicator, View } from 'react-native';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
+import RunScreen from './src/screens/RunScreen';
+import SessionScreen from './src/screens/SessionScreen';
+import SummaryScreen from './src/screens/SummaryScreen';
 import { colors } from './src/theme/tokens';
 
 const Stack = createNativeStackNavigator();
@@ -41,7 +44,14 @@ function RootNavigator() {
       }}
     >
       {isAuthenticated ? (
-        <Stack.Screen name="Home" component={HomeScreen} />
+        <>
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Session" component={SessionScreen} />
+          <Stack.Screen name="Run" component={RunScreen} />
+          {/* SessionScreen navigates to 'RunScreen'; alias until it's updated */}
+          <Stack.Screen name="RunScreen" component={RunScreen} />
+          <Stack.Screen name="Summary" component={SummaryScreen} />
+        </>
       ) : (
         <Stack.Screen name="Login" component={LoginScreen} />
       )}
